@@ -39,6 +39,9 @@ aspect_ratio = '16_9_'
 write_out_width =1280
 write_out_height = 720
 
+#determines if clip is written out or not
+write_out = False
+
 #Percentage of frame for top margin
 top_margin = 0.08
 
@@ -193,7 +196,7 @@ with mp_holistic.Holistic(min_detection_confidence=0.4, min_tracking_confidence=
         #line for the top margin
         cv2.line(dst, (0,int(top_margin*h)), (w,int(top_margin*h)), color=(0, 0, 255), thickness=2)
 
-        if ret == True: 
+        if ret == True and write_out = True: 
             result.write(dst)
                 
         cv2.imshow('Zoomed',dst)
