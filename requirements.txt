@@ -1,0 +1,5 @@
+mediapipe
+numpy
+cv2
+os
+random
