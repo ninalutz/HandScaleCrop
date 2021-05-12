@@ -1,3 +1,4 @@
+
 import mediapipe as mp
 import numpy as np
 import cv2
@@ -6,26 +7,39 @@ from utils import draw_hands, bbox, get_centroid
 mp_drawing = mp.solutions.drawing_utils
 mp_holistic = mp.solutions.holistic
 
+
+import plotly.express as px
+
+
 mp_holistic.POSE_CONNECTIONS
 
 mp_drawing.DrawingSpec(color=(0,0,255), thickness=2, circle_radius=2)
 
 mp_drawing.draw_landmarks
 zoom_count = 0
-# cap = cv2.VideoCapture('3_overlap/3_count2_overlap.mov')
-# cap = cv2.VideoCapture('1_overlap/1_count1_overlap.mp4')
-# cap = cv2.VideoCapture('2_overlap/count4_overlap.mov') #this one isn't working right
-# cap = cv2.VideoCapture('2_overlap/count5_overlap.mov')
-# cap = cv2.VideoCapture('9_overlap/9_count6_overlap.mov') #this one is also weird
-# cap = cv2.VideoCapture('4_overlap/4_count7_overlap.mov') 
-cap = cv2.VideoCapture('../ThesisData/4_overlap/4_count8_overlap.mov') #not working AT ALL so need to look into this method
+test_file = '1_overlap/1_count1_overlap.mp4'
+test_file = '3_overlap/3_count2_overlap.mov'
+test_file = '2_overlap/count4_overlap.mov'
+test_file = '2_overlap/count5_overlap.mov'
+# test_file = '9_overlap/9_count6_overlap.mov' #this one is also weird
+# test_file = '4_overlap/4_count7_overlap.mov'
+# test_file = '4_overlap/4_count8_overlap.mov' #not working AT ALL so need to look into this method
+
+# cap = cv2.VideoCapture('../ThesisData/)
+cap = cv2.VideoCapture('../ThesisData/' + test_file)
+
+# cap = cv2.VideoCapture('../ThesisData/4_overlap/4_count8_overlap.mov') #not working AT ALL so need to look into this method
 
 
+zooms = []
+frames = []
+frameCount = 0
 
 aspect_ratio = '16_9_'
 write_out_width =1280
 write_out_height = 720
 
+#Percentage of frame for top margin
 top_margin = 0.08
 
 # aspect_ratio = '16_10_'
@@ -52,7 +66,6 @@ fps = cap.get(cv2.CAP_PROP_FPS)
 result = cv2.VideoWriter(aspect_ratio+'test.mp4', fourcc, fps, size)
 
 
-
 def draw_circle(event,x,y,flags,param):
     global mouseX,mouseY
     if event == cv2.EVENT_LBUTTONDBLCLK:
@@ -68,7 +81,11 @@ with mp_holistic.Holistic(min_detection_confidence=0.4, min_tracking_confidence=
         try:
             h, w, c = frame.shape
         except:
+            cap.release()
+            result.release()
+            break
             print("HELLO")
+
 
         # Recolor Feed
         image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -120,7 +137,6 @@ with mp_holistic.Holistic(min_detection_confidence=0.4, min_tracking_confidence=
 
         box = bbox(global_x_min, global_x_max, global_y_min, global_y_max)
 
-        #TODO - more sophisticated way to get centroid for whole clip 
         if not center_assigned and global_x_max - global_x_min > 0:
             # print("HELLO")
             center = get_centroid(global_x_min, global_x_max, global_y_min, global_y_max)
@@ -130,12 +146,20 @@ with mp_holistic.Holistic(min_detection_confidence=0.4, min_tracking_confidence=
 
         cv2.rectangle(image, (box[0], box[2]), (box[1], box[3]), (0, 255, 0), 2)
 
+        cv2.line(image, (0,box[2]), (w,box[2]), color=(0, 255, 255), thickness=2)
+
+        cv2.line(image, (0,int(top_margin*h)), (w,int(top_margin*h)), color=(255, 0,0), thickness=2)
+
+
+        #line for the box?
+
         print("Distance from bounding box top to 0: " + str(box[2]) + " percent: " + str(box[2]/h))
 
         zoom_ratio = (box[2]/h)/top_margin
-        print(zoom_ratio)
-
-        #TODO -- make hands the same size by making zoom factor based off bounding box size
+        
+        frames.append(frameCount)
+        zooms.append(zoom_ratio)
+        frameCount += 1
 
         cv2.imshow('Video', image)
 
@@ -166,17 +190,13 @@ with mp_holistic.Holistic(min_detection_confidence=0.4, min_tracking_confidence=
 
         dst = cv2.warpPerspective(frame,M,(write_out_width,write_out_height))
 
-        # cv2.line(dst, (0,int(top_margin*h)), (w,int(top_margin*h)), color=(0, 0, 255), thickness=2)
-
-        cv2.line(dst, (0,int(box[2]*zoom_ratio)), (w,int(box[2]*zoom_ratio)), color=(255, 0, 255), thickness=2)
+        #line for the top margin
+        cv2.line(dst, (0,int(top_margin*h)), (w,int(top_margin*h)), color=(0, 0, 255), thickness=2)
 
         if ret == True: 
             result.write(dst)
                 
         cv2.imshow('Zoomed',dst)
-
-        cv2.setMouseCallback('Video',draw_circle)
-
 
         if cv2.waitKey(10) & 0xFF == ord('q'):
             break
@@ -185,3 +205,12 @@ cap.release()
 result.release()
 cv2.destroyAllWindows()
 
+average_zoom = sum(zooms)/len(zooms)
+
+print("Average zoom: " + str(average_zoom))
+
+#TODO - redo w/ the average zoom and average center 
+
+fig = px.scatter(x=frames, y=zooms,  title=test_file.split('/')[1] + " | " + "Average zoom: " + str(sum(zooms)/len(zooms)))
+
+fig.show()

@@ -15,10 +15,12 @@ mp_drawing.DrawingSpec(color=(0,0,255), thickness=2, circle_radius=2)
 mp_drawing.draw_landmarks
 center_assigned = False
 
+#Centers -- pre-assigned if not assigned in code
 centers = [[0, 0], [0,0], [630, 370], [0, 0], [0,0],
 [0, 0], [0,0], [0, 0], [600, 500], [630, 380], [0,0],
 [620, 500],[0,0],[630, 440],[620, 400],[0, 0]]
 
+#Temporary zoom ratios
 zooms = {'4_3_':[7, 4.7, 6,6,4.5,4,5.5,
 9,4,3.7,0,0,3.5,5,4,4.5], '3_2_':[6.2, 4.7, 6,6,4.5,4,5.5,
 9,4,3.7,0,0,3.5,5,4,4.5], '16_10_':[9,6.3,8.7,8.5,4.7,5.7,
@@ -28,14 +30,16 @@ zooms = {'4_3_':[7, 4.7, 6,6,4.5,4,5.5,
 write_out_widths = [1024, 1080, 1680, 1280]
 write_out_heights = [768, 720, 1050, 720]
 
+#Toggles whether the code should write results to file or not 
+write_to_file = False
+
 aspect_ratios = ['4_3_', '3_2_', '16_10_', '16_9_']
 
 files = []
 for i in range(1, 11):
+    #Gets a random file from the number file -- will change in final version 
     file = random.choice(os.listdir("../ThesisData/" + str(i) + "_overlap/")) #change dir name to whatever
     print("FILE: " + file)
-    # count_number = int(file.split("count")[1].split("_")[0])
-    # print(count_number)
     print(file.split("count")[1].split("_")[0])
     files.append(str(i) + "_overlap/" + file)
 

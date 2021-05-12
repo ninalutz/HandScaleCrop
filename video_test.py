@@ -71,8 +71,6 @@ with mp_holistic.Holistic(min_detection_confidence=0.4, min_tracking_confidence=
 					if y < global_y_min:
 						global_y_min = y
 
-
-
 		#TODO - more sophisticated way to get centroid for whole clip 
 		if not center_assigned and global_x_max - global_x_min > 0:
 			center = get_centroid(global_x_min, global_x_max, global_y_min, global_y_max)
