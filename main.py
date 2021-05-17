@@ -36,12 +36,12 @@ write_to_file = False
 aspect_ratios = ['4_3_', '3_2_', '16_10_', '16_9_']
 
 files = []
-for i in range(1, 11):
+# for i in range(1, 11):
     #Gets a random file from the number file -- will change in final version 
-    file = random.choice(os.listdir("../ThesisData/" + str(i) + "_overlap/")) #change dir name to whatever
-    print("FILE: " + file)
-    print(file.split("count")[1].split("_")[0])
-    files.append(str(i) + "_overlap/" + file)
+    # file = random.choice(os.listdir("../ThesisData/" + str(i) + "_overlap/")) #change dir name to whatever
+    # print("FILE: " + file)
+    # print(file.split("count")[1].split("_")[0])
+    # files.append(str(i) + "_overlap/" + file)
 
 aspect_counter = 0
 
@@ -49,16 +49,18 @@ aspect_ratio = aspect_ratios[0]
 write_out_width = write_out_widths[aspect_counter]
 write_out_height = write_out_heights[aspect_counter]
 
-
-cap = cv2.VideoCapture(files[0])
+file = "newtest.mp4"
+# cap = cv2.VideoCapture(files[0])
+cap = cv2.VideoCapture("archive.mp4")
 
 current_number = 1
-count_number = int(file.split("count")[1].split("_")[0])
+# count_number = int(file.split("count")[1].split("_")[0])
+count_number = 1
 zoom_ratio = zooms[aspect_ratio][count_number-1]
 center = centers[count_number-1]
 
 
-print(files[0])
+# print(files[0])
 print(zoom_ratio)
 print(count_number)
 print(center)

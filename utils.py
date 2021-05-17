@@ -1,3 +1,7 @@
+import mediapipe as mp
+import numpy as np
+import cv2
+
 """
 Draws landmarks and segments
 """
@@ -92,3 +96,34 @@ def write_out(filename, cap):
 
 def plot_bbox(delta):
     return "" 
+
+
+"""
+Draws debug lines/boxes for debug
+"""
+def draw_debugs(image, center, box, w, h, top_margin):
+    cv2.circle(image, (center[0],center[1]), radius=2, color=(0, 0, 255), thickness=2)
+    cv2.rectangle(image, (box[0], box[2]), (box[1], box[3]), (0, 255, 0), 2)
+    cv2.line(image, (0,box[2]), (w,box[2]), color=(0, 255, 255), thickness=2)
+    cv2.line(image, (0,int(top_margin*h)), (w,int(top_margin*h)), color=(255, 0,0), thickness=2)
+
+"""
+Solves globals for landmarks
+"""
+def solve_globals(landmarks, direction, global_x_min, global_y_min, global_x_max, global_y_max, w, h):
+    x_max = 0
+    y_max = 0
+    x_min = w
+    y_min = h
+    for data_point in landmarks:
+        x, y = int(data_point.x * w), int(data_point.y * h)
+        if x > global_x_max:
+            global_x_max = x
+        if x < global_x_min:
+            global_x_min = x
+        if y > global_y_max:
+            global_y_max = y
+        if y < global_y_min:
+            global_y_min = y
+    #TODO - write out direction
+    return [global_x_min, global_y_min, global_x_max, global_y_max]
