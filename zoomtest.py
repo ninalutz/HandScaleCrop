@@ -17,21 +17,20 @@ mp_drawing.DrawingSpec(color=(0,0,255), thickness=2, circle_radius=2)
 
 mp_drawing.draw_landmarks
 zoom_count = 0
-# test_file = '3_overlap/3_count1_overlap.mp4'
-test_file = '3_overlap/3_count2_overlap.mov'
-# test_file = '2_overlap/count5_overlap.mov'
 
-# test_file = '4_overlap/4_count7_overlap.mov'
-# test_file = '5_overlap/5_count13_overlap.mov' 
 
-#Strug buses
-# test_file = '2_overlap/count4_overlap.mov'
-# test_file = '9_overlap/9_count6_overlap.mov' #this one is also weird
-# test_file = '4_overlap/4_count8_overlap.mov' #not working AT ALL so need to look into this method
-# test_file = '7_overlap/7_count16_overlap.mov'
+files = ['1_overlap/1_count1_overlap.mp4', '2_overlap/count5_overlap.mov', 
+'3_overlap/3_count8_overlap.mov', '4_overlap/4_count7_overlap.mov', 
+'5_overlap/5_count1_overlap.mp4', '6_overlap/6_count2_overlap.mov',
+'7_overlap/7_count13_overlap.mov', '8_overlap/8_count16_overlap.mov', 
+'9_overlap/9_count2_overlap.mp4', '10_overlap/10_count8_overlap.mov']
+
+test_file = files[9]
 
 # cap = cv2.VideoCapture('../ThesisData/)
 cap = cv2.VideoCapture('../ThesisData/' + test_file)
+
+
 
 # cap = cv2.VideoCapture('../ThesisData/4_overlap/4_count8_overlap.mov') #not working AT ALL so need to look into this method
 
@@ -40,9 +39,9 @@ zooms = []
 frames = []
 frameCount = 0
 
-aspect_ratio = '16_9_'
-write_out_width =1280
-write_out_height = 720
+# aspect_ratio = '16_9_'
+# write_out_width =1280
+# write_out_height = 720
 
 #determines if clip is written out or not
 write_out = False
@@ -54,9 +53,9 @@ top_margin = 0.08
 # write_out_width =1680
 # write_out_height = 1050
 
-# aspect_ratio = '4_3_'
-# write_out_width = 1024
-# write_out_height = 768
+aspect_ratio = '4_3_'
+write_out_width = 1024
+write_out_height = 768
 zoom_ratio = 1
 zoom_assigned = False
 
@@ -166,7 +165,8 @@ with mp_holistic.Holistic(min_detection_confidence=0.4, min_tracking_confidence=
         print("Distance from bounding box top to 0: " + str(box[2]) + " percent: " + str(box[2]/h))
 
 
-        zoom_ratio = (box[2]/h)/top_margin
+        if not zoom_assigned:
+            zoom_ratio = (box[2]/h)/top_margin
         
         frames.append(frameCount)
         zooms.append(zoom_ratio)

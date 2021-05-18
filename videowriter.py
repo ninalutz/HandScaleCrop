@@ -74,18 +74,12 @@ def stitch_videos(paths, result_name):
     final_clip = concatenate_videoclips(clips)
     final_clip.write_videofile(result_name+".mp4")
 
-# stitch_videos(sharp_paths, "sharpened")
+res_paths = []
+
+for i in range(1, 11):
+    res_paths.append("upscale_results/" + str(i) + ".mov")
+
+stitch_videos(res_paths, "upscaledHD")
 
 
-for val in values:
-    paths = []
-    result = ""
-    for i in range(1,11):
-        paths.append("Variations_5_14_21/sharpen_median_" + str(val) + "/" + str(i) + ".mov")
-        result_name = "sharpen_median_" + str(val) + "_count.mov" 
-    stitch_videos(paths, result_name)
-    paths = []
-    for i in range(1, 11):
-        paths.append("Variations_5_14_21/sharpen_gaus_" + str(val) + "/" + str(i) + ".mov")
-        result_name = "sharpen_gaus_" + str(val) + "_count.mov" 
-    stitch_videos(paths, result_name)
+
