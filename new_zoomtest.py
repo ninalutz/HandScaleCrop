@@ -3,6 +3,7 @@ import mediapipe as mp
 import numpy as np
 import cv2
 from utils import draw_hands, bbox, get_centroid, solve_globals, draw_debugs
+from zoom import zoom_frame
 
 mp_drawing = mp.solutions.drawing_utils
 mp_holistic = mp.solutions.holistic
@@ -18,10 +19,8 @@ mp_drawing.DrawingSpec(color=(0,0,255), thickness=2, circle_radius=2)
 mp_drawing.draw_landmarks
 zoom_count = 0
 # test_file = '3_overlap/3_count1_overlap.mp4'
-
 test_file = '3_overlap/3_count2_overlap.mov'
 # test_file = '2_overlap/count5_overlap.mov'
-
 # test_file = '4_overlap/4_count7_overlap.mov'
 # test_file = '5_overlap/5_count13_overlap.mov'
 
@@ -30,7 +29,8 @@ test_file = '3_overlap/3_count2_overlap.mov'
 # test_file = '2_overlap/count4_overlap.mov'
 # test_file = '9_overlap/9_count6_overlap.mov' #this one is also weird
 # test_file = '4_overlap/4_count8_overlap.mov' #not working AT ALL so need to look into this method
-# test_file = '7_overlap/7_count16_overlap.mov'
+test_file = '7_overlap/7_count16_overlap.mov'
+test_file = '10_overlap/10_count8_overlap.mov'
 
 # cap = cv2.VideoCapture('../ThesisData/)
 cap = cv2.VideoCapture('../ThesisData/' + test_file)
@@ -126,55 +126,14 @@ with mp_holistic.Holistic(min_detection_confidence=0.4, min_tracking_confidence=
             center = get_centroid(global_x_min, global_x_max, global_y_min, global_y_max)
             center_assigned = True
 
-
         if debug_draw:
             draw_debugs(image, center, box, w, h, top_margin)
 
         print("Distance from bounding box top to 0: " + str(box[2]) + " percent: " + str(box[2]/h))
 
-
-
-        zoom_ratio = (box[2]/h)/top_margin
-        
-        frames.append(frameCount)
-        zooms.append(zoom_ratio)
-        frameCount += 1
+        dst = zoom_frame_old(frame, box, center, w, h, top_margin, frames, frameCount, zooms, write_out_width, write_out_height)
 
         cv2.imshow('Video', image)
-
-        x1 = center[0] - write_out_width/zoom_ratio
-    
-        if x1 < 0:
-            x1 = 0
-
-        x2 = center[0] + write_out_width/zoom_ratio
-    
-        if x2 > write_out_width:
-            x2 = write_out_width
-        
-        y1 = center[1] - write_out_height/zoom_ratio
-    
-        if y1 < 0:
-            y1 = 0
-    
-        y2 = center[1] + write_out_height/zoom_ratio
-        
-        if y2 > write_out_height:
-            y2 = write_out_height
-    
-        pts1 = np.float32([[x1,y1],[x2,y1],[x1,y2],[x2,y2]])
-        pts2 = np.float32([[0,0],[write_out_width,0],[0,write_out_height],[write_out_width,write_out_height]])
-
-        M = cv2.getPerspectiveTransform(pts1,pts2)
-
-        dst = cv2.warpPerspective(frame,M,(write_out_width,write_out_height))
-
-        #line for the top margin
-        cv2.line(dst, (0,int(top_margin*h)), (w,int(top_margin*h)), color=(0, 0, 255), thickness=2)
-
-        if ret == True  and write_out == True: 
-            result.write(dst)
-                
         cv2.imshow('Zoomed',dst)
 
         if cv2.waitKey(10) & 0xFF == ord('q'):

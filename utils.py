@@ -94,9 +94,6 @@ def write_out(filename, cap):
         else:
             break
 
-def plot_bbox(delta):
-    return "" 
-
 
 """
 Draws debug lines/boxes for debug
